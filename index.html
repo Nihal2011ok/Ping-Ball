@@ -8,11 +8,17 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="score">Score: <span id="score-value">0</span></div>
-        <div id="game-board">
-            <div id="ball"></div>
+        <div id="game-info">
+            <div id="score">Score: <span id="score-value">0</span></div>
+            <div id="balls-left">Balls: <span id="balls-value">5</span></div>
         </div>
+        <div id="game-board"></div>
         <button id="drop-button">Drop Ball</button>
+        <div id="game-over" class="hidden">
+            <h2>Game Over!</h2>
+            <p>Your final score: <span id="final-score"></span></p>
+            <button id="restart-button">Play Again</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
