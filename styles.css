@@ -31,11 +31,14 @@ body {
 .ball {
     width: 20px;
     height: 20px;
-    background-color: red;
     border-radius: 50%;
     position: absolute;
     transition: all 0.1s;
 }
+
+.ball.normal { background-color: red; }
+.ball.heavy { background-color: blue; }
+.ball.lucky { background-color: gold; }
 
 .peg {
     width: 10px;
@@ -61,14 +64,14 @@ body {
 .power-up {
     width: 30px;
     height: 30px;
-    background-color: gold;
+    background-color: purple;
     border-radius: 50%;
     position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    color: black;
+    color: white;
 }
 
 .obstacle {
@@ -78,27 +81,31 @@ body {
     position: absolute;
 }
 
-#drop-button {
+#ball-selection, #drop-button, #shop-button {
     margin-top: 10px;
+}
+
+button {
     padding: 10px 20px;
-    font-size: 18px;
+    font-size: 16px;
     background-color: #4a90e2;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin: 0 5px;
 }
 
-#drop-button:hover {
+button:hover {
     background-color: #357ae8;
 }
 
-#drop-button:disabled {
+button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }
 
-#game-over {
+#shop, #game-over {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -113,17 +120,15 @@ body {
     display: none;
 }
 
-#restart-button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.effect {
+    position: absolute;
+    font-size: 20px;
+    font-weight: bold;
+    animation: float-up 1s ease-out;
+    pointer-events: none;
 }
 
-#restart-button:hover {
-    background-color: #45a049;
+@keyframes float-up {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-50px); opacity: 0; }
 }

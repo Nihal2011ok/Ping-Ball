@@ -12,9 +12,22 @@
             <div id="score">Score: <span id="score-value">0</span></div>
             <div id="level">Level: <span id="level-value">1</span></div>
             <div id="balls-left">Balls: <span id="balls-value">5</span></div>
+            <div id="coins">Coins: <span id="coins-value">0</span></div>
         </div>
         <div id="game-board"></div>
+        <div id="ball-selection">
+            <button class="ball-type" data-type="normal">Normal</button>
+            <button class="ball-type" data-type="heavy">Heavy</button>
+            <button class="ball-type" data-type="lucky">Lucky</button>
+        </div>
         <button id="drop-button">Drop Ball</button>
+        <button id="shop-button">Shop</button>
+        <div id="shop" class="hidden">
+            <h2>Shop</h2>
+            <button class="shop-item" data-item="extraBall">Extra Ball (10 coins)</button>
+            <button class="shop-item" data-item="multiplier">Score Multiplier (20 coins)</button>
+            <button id="close-shop">Close</button>
+        </div>
         <div id="game-over" class="hidden">
             <h2>Game Over!</h2>
             <p>Your final score: <span id="final-score"></span></p>

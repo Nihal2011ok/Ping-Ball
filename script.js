@@ -1,19 +1,26 @@
 const gameBoard = document.getElementById('game-board');
 const dropButton = document.getElementById('drop-button');
+const shopButton = document.getElementById('shop-button');
 const scoreElement = document.getElementById('score-value');
 const levelElement = document.getElementById('level-value');
 const ballsLeftElement = document.getElementById('balls-value');
+const coinsElement = document.getElementById('coins-value');
 const gameOverElement = document.getElementById('game-over');
 const finalScoreElement = document.getElementById('final-score');
 const finalLevelElement = document.getElementById('final-level');
 const restartButton = document.getElementById('restart-button');
+const shopElement = document.getElementById('shop');
+const closeShopButton = document.getElementById('close-shop');
 
 let score = 0;
 let level = 1;
 let ballsLeft = 5;
+let coins = 0;
 let activeBalls = [];
 let powerUps = [];
 let obstacles = [];
+let selectedBallType = 'normal';
+let scoreMultiplier = 1;
 
 const basketValues = [1, 2, 3, 2, 1];
 
@@ -23,6 +30,7 @@ function initializeGame() {
     createBaskets();
     createPowerUps();
     createObstacles();
+    updateDisplay();
 }
 
 function clearBoard() {
@@ -76,7 +84,7 @@ function createObstacles() {
 
 function createBall() {
     const ball = document.createElement('div');
-    ball.className = 'ball';
+    ball.className = `ball ${selectedBallType}`;
     ball.style.left = '140px';
     ball.style.top = '0px';
     gameBoard.appendChild(ball);
@@ -84,6 +92,7 @@ function createBall() {
         element: ball,
         x: 140,
         y: 0,
+        type: selectedBallType,
         multiplier: 1
     };
 }
@@ -93,7 +102,7 @@ function dropBall() {
         const newBall = createBall();
         activeBalls.push(newBall);
         ballsLeft--;
-        ballsLeftElement.textContent = ballsLeft;
+        updateDisplay();
         if (ballsLeft === 0) {
             dropButton.disabled = true;
         }
@@ -102,14 +111,16 @@ function dropBall() {
 }
 
 function animateBall(ball) {
-    ball.y += 3;
+    let speed = ball.type === 'heavy' ? 4 : 3;
+    ball.y += speed;
     ball.element.style.top = `${ball.y}px`;
 
     checkCollisions(ball);
 
     if (ball.y < 360) {
         if (ball.y % 60 === 0) {
-            ball.x += Math.random() < 0.5 ? -20 : 20;
+            let deviation = ball.type === 'heavy' ? 10 : 20;
+            ball.x += Math.random() < 0.5 ? -deviation : deviation;
             ball.element.style.left = `${ball.x}px`;
         }
         requestAnimationFrame(() => animateBall(ball));
@@ -127,12 +138,18 @@ function checkCollisions(ball) {
             ball.multiplier = 2;
             gameBoard.removeChild(powerUp);
             powerUps.splice(index, 1);
+            showEffect('2x', ball.x, ball.y);
         }
     });
 
     obstacles.forEach((obstacle) => {
         if (isColliding(ball, obstacle)) {
-            ball.y = 360; 
+            if (ball.type !== 'heavy') {
+                ball.y = 360; 
+                showEffect('Blocked!', ball.x, ball.y);
+            } else {
+                showEffect('Smash!', ball.x, ball.y);
+            }
         }
     });
 }
@@ -148,14 +165,29 @@ function isColliding(ball, element) {
 
 function updateScore(ball) {
     const basketIndex = Math.floor(ball.x / 60);
-    const points = basketValues[basketIndex] * ball.multiplier;
+    let points = basketValues[basketIndex] * ball.multiplier * scoreMultiplier;
+    if (ball.type === 'lucky') {
+        points *= 2;
+    }
     score += points;
-    scoreElement.textContent = score;
+    coins += Math.floor(points / 10);
+    updateDisplay();
+    showEffect(`+${points}`, ball.x, 360);
+}
+
+function showEffect(text, x, y) {
+    const effect = document.createElement('div');
+    effect.className = 'effect';
+    effect.textContent = text;
+    effect.style.left = `${x}px`;
+    effect.style.top = `${y}px`;
+    gameBoard.appendChild(effect);
+    setTimeout(() => gameBoard.removeChild(effect), 1000);
 }
 
 function checkGameOver() {
     if (ballsLeft === 0 && activeBalls.length === 0) {
-        if (score > level * 10) {
+        if (score > level * 15) {
             levelUp();
         } else {
             endGame();
@@ -166,8 +198,7 @@ function checkGameOver() {
 function levelUp() {
     level++;
     ballsLeft = 5;
-    levelElement.textContent = level;
-    ballsLeftElement.textContent = ballsLeft;
+    updateDisplay();
     dropButton.disabled = false;
     initializeGame();
 }
@@ -182,17 +213,66 @@ function restartGame() {
     score = 0;
     level = 1;
     ballsLeft = 5;
+    coins = 0;
     activeBalls = [];
     powerUps = [];
     obstacles = [];
-    scoreElement.textContent = score;
-    levelElement.textContent = level;
-    ballsLeftElement.textContent = ballsLeft;
+    scoreMultiplier = 1;
+    updateDisplay();
     gameOverElement.classList.add('hidden');
     dropButton.disabled = false;
     initializeGame();
 }
 
+function updateDisplay() {
+    scoreElement.textContent = score;
+    levelElement.textContent = level;
+    ballsLeftElement.textContent = ballsLeft;
+    coinsElement.textContent = coins;
+}
+
+function openShop() {
+    shopElement.classList.remove('hidden');
+}
+
+function closeShop() {
+    shopElement.classList.add('hidden');
+}
+
+function buyShopItem(item) {
+    switch(item) {
+        case 'extraBall':
+            if (coins >= 10) {
+                coins -= 10;
+                ballsLeft++;
+                updateDisplay();
+                dropButton.disabled = false;
+            }
+            break;
+        case 'multiplier':
+            if (coins >= 20) {
+                coins -= 20;
+                scoreMultiplier *= 1.5;
+                updateDisplay();
+            }
+            break;
+    }
+}
+
 initializeGame();
 dropButton.addEventListener('click', dropBall);
 restartButton.addEventListener('click', restartGame);
+shopButton.addEventListener('click', openShop);
+closeShopButton.addEventListener('click', closeShop);
+
+document.querySelectorAll('.ball-type').forEach(button => {
+    button.addEventListener('click', (e) => {
+        selectedBallType = e.target.dataset.type;
+    });
+});
+
+document.querySelectorAll('.shop-item').forEach(button => {
+    button.addEventListener('click', (e) => {
+        buyShopItem(e.target.dataset.item);
+    });
+});
