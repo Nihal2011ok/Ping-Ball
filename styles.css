@@ -1,10 +1,27 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+#game-container {
+    text-align: center;
+}
+
 #game-board {
     width: 300px;
     height: 400px;
-    background-color: #f0f0f0;
+    background-color: #e0e0e0;
     position: relative;
     overflow: hidden;
+    border: 2px solid #333;
+    border-radius: 10px;
 }
+
 #ball {
     width: 20px;
     height: 20px;
@@ -13,18 +30,46 @@
     position: absolute;
     top: 0;
     left: 140px;
+    transition: all 0.1s;
 }
+
 .peg {
     width: 10px;
     height: 10px;
-    background-color: blue;
+    background-color: #4a90e2;
     border-radius: 50%;
     position: absolute;
 }
+
 .basket {
     width: 60px;
     height: 40px;
-    background-color: green;
+    background-color: #4caf50;
     position: absolute;
     bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    font-weight: bold;
+    color: white;
+}
+
+#score {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+#drop-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#drop-button:hover {
+    background-color: #357ae8;
 }
