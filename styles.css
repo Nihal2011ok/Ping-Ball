@@ -58,6 +58,26 @@ body {
     color: white;
 }
 
+.power-up {
+    width: 30px;
+    height: 30px;
+    background-color: gold;
+    border-radius: 50%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: black;
+}
+
+.obstacle {
+    width: 40px;
+    height: 10px;
+    background-color: #ff4444;
+    position: absolute;
+}
+
 #drop-button {
     margin-top: 10px;
     padding: 10px 20px;
