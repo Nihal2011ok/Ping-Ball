@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ball Drop Game</title>
+    <title>Ball Drop Game V6</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,22 +19,41 @@
             <button class="ball-type" data-type="normal">Normal</button>
             <button class="ball-type" data-type="heavy">Heavy</button>
             <button class="ball-type" data-type="lucky">Lucky</button>
+            <button class="ball-type" data-type="ghost">Ghost</button>
         </div>
         <button id="drop-button">Drop Ball</button>
         <button id="shop-button">Shop</button>
-        <div id="shop" class="hidden">
+        <button id="achievements-button">Achievements</button>
+        <button id="daily-challenge-button">Daily Challenge</button>
+        <div id="shop" class="modal hidden">
             <h2>Shop</h2>
             <button class="shop-item" data-item="extraBall">Extra Ball (10 coins)</button>
             <button class="shop-item" data-item="multiplier">Score Multiplier (20 coins)</button>
+            <button class="shop-item" data-item="ghostBall">Unlock Ghost Ball (50 coins)</button>
             <button id="close-shop">Close</button>
         </div>
-        <div id="game-over" class="hidden">
+        <div id="achievements" class="modal hidden">
+            <h2>Achievements</h2>
+            <ul id="achievement-list"></ul>
+            <button id="close-achievements">Close</button>
+        </div>
+        <div id="daily-challenge" class="modal hidden">
+            <h2>Daily Challenge</h2>
+            <p id="challenge-description"></p>
+            <button id="start-challenge">Start Challenge</button>
+            <button id="close-daily-challenge">Close</button>
+        </div>
+        <div id="game-over" class="modal hidden">
             <h2>Game Over!</h2>
             <p>Your final score: <span id="final-score"></span></p>
             <p>Highest level reached: <span id="final-level"></span></p>
             <button id="restart-button">Play Again</button>
         </div>
     </div>
+    <div id="notification" class="hidden"></div>
+    <audio id="bounce-sound" src="bounce.mp3"></audio>
+    <audio id="coin-sound" src="coin.mp3"></audio>
+    <audio id="powerup-sound" src="powerup.mp3"></audio>
     <script src="script.js"></script>
 </body>
 </html>

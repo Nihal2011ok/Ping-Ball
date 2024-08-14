@@ -24,6 +24,20 @@ let scoreMultiplier = 1;
 
 const basketValues = [1, 2, 3, 2, 1];
 
+let achievements = [
+    { id: 'score100', name: 'Century', description: 'Score 100 points in a single game', achieved: false },
+    { id: 'level5', name: 'High Climber', description: 'Reach level 5', achieved: false },
+    { id: 'lucky10', name: 'Fortune Favors the Bold', description: 'Use the lucky ball 10 times', achieved: false }
+];
+
+let dailyChallenge = {
+    description: 'Score 200 points using only normal balls',
+    active: false,
+    progress: 0,
+    goal: 200
+};
+
+let unlockedBalls = ['normal', 'heavy', 'lucky'];
 function initializeGame() {
     clearBoard();
     createPegs();
@@ -31,6 +45,8 @@ function initializeGame() {
     createPowerUps();
     createObstacles();
     updateDisplay();
+    updateAchievements();
+    generateDailyChallenge();
 }
 
 function clearBoard() {
@@ -82,11 +98,88 @@ function createObstacles() {
     }
 }
 
+function updateAchievements() {
+    const achievementList = document.getElementById('achievement-list');
+    achievementList.innerHTML = '';
+    achievements.forEach(achievement => {
+        const li = document.createElement('li');
+        li.textContent = `${achievement.name}: ${achievement.description} ${achievement.achieved ? '✅' : ''}`;
+        achievementList.appendChild(li);
+    });
+}
+
+function checkAchievements() {
+    if (score >= 100 && !achievements[0].achieved) {
+        achievements[0].achieved = true;
+        showNotification('Achievement unlocked: Century!');
+    }
+    if (level >= 5 && !achievements[1].achieved) {
+        achievements[1].achieved = true;
+        showNotification('Achievement unlocked: High Climber!');
+    }
+}
+
+function generateDailyChallenge() {
+    const challenges = [
+        { description: 'Score 200 points using only normal balls', goal: 200 },
+        { description: 'Reach level 5 without using power-ups', goal: 5 },
+        { description: 'Collect 50 coins in a single game', goal: 50 }
+    ];
+    dailyChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+    dailyChallenge.active = false;
+    dailyChallenge.progress = 0;
+    document.getElementById('challenge-description').textContent = dailyChallenge.description;
+}
+
+function startDailyChallenge() {
+    dailyChallenge.active = true;
+    restartGame();
+    showNotification('Daily Challenge started!');
+}
+
+function updateDailyChallengeProgress() {
+    if (dailyChallenge.active) {
+        switch (dailyChallenge.description) {
+            case 'Score 200 points using only normal balls':
+                if (selectedBallType === 'normal') {
+                    dailyChallenge.progress = score;
+                }
+                break;
+            case 'Reach level 5 without using power-ups':
+                dailyChallenge.progress = level;
+                break;
+            case 'Collect 50 coins in a single game':
+                dailyChallenge.progress = coins;
+                break;
+        }
+        if (dailyChallenge.progress >= dailyChallenge.goal) {
+            showNotification('Daily Challenge completed!');
+            dailyChallenge.active = false;
+        }
+    }
+}
+
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.classList.remove('hidden');
+    setTimeout(() => notification.classList.add('hidden'), 3000);
+}
+
+function playSound(soundId) {
+    const sound = document.getElementById(soundId);
+    sound.currentTime = 0;
+    sound.play();
+}
+
 function createBall() {
     const ball = document.createElement('div');
     ball.className = `ball ${selectedBallType}`;
     ball.style.left = '140px';
     ball.style.top = '0px';
+    if (selectedBallType === 'ghost' && !unlockedBalls.includes('ghost')) {
+        selectedBallType = 'normal';
+    }
     gameBoard.appendChild(ball);
     return {
         element: ball,
@@ -116,7 +209,9 @@ function animateBall(ball) {
     ball.element.style.top = `${ball.y}px`;
 
     checkCollisions(ball);
-
+   if (ball.y % 60 === 0) {
+        playSound('bounce-sound');
+    }
     if (ball.y < 360) {
         if (ball.y % 60 === 0) {
             let deviation = ball.type === 'heavy' ? 10 : 20;
@@ -145,7 +240,7 @@ function checkCollisions(ball) {
     obstacles.forEach((obstacle) => {
         if (isColliding(ball, obstacle)) {
             if (ball.type !== 'heavy') {
-                ball.y = 360; 
+                ball.y = 360; // End ball movement
                 showEffect('Blocked!', ball.x, ball.y);
             } else {
                 showEffect('Smash!', ball.x, ball.y);
@@ -173,6 +268,9 @@ function updateScore(ball) {
     coins += Math.floor(points / 10);
     updateDisplay();
     showEffect(`+${points}`, ball.x, 360);
+    playSound('coin-sound');
+    checkAchievements();
+    updateDailyChallengeProgress();
 }
 
 function showEffect(text, x, y) {
@@ -255,9 +353,38 @@ function buyShopItem(item) {
                 scoreMultiplier *= 1.5;
                 updateDisplay();
             }
+        case 'ghostBall':
+            if (coins >= 50 && !unlockedBalls.includes('ghost')) {
+                coins -= 50;
+                unlockedBalls.push('ghost');
+                updateDisplay();
+                showNotification('Ghost Ball unlocked!');
+            }
             break;
     }
 }
+
+document.getElementById('achievements-button').addEventListener('click', () => {
+    document.getElementById('achievements').classList.remove('hidden');
+});
+
+document.getElementById('close-achievements').addEventListener('click', () => {
+    document.getElementById('achievements').classList.add('hidden');
+});
+
+document.getElementById('daily-challenge-button').addEventListener('click', () => {
+    document.getElementById('daily-challenge').classList.remove('hidden');
+});
+
+document.getElementById('close-daily-challenge').addEventListener('click', () => {
+    document.getElementById('daily-challenge').classList.add('hidden');
+});
+
+document.getElementById('start-challenge').addEventListener('click', () => {
+    startDailyChallenge();
+    document.getElementById('daily-challenge').classList.add('hidden');
+});
+
 
 initializeGame();
 dropButton.addEventListener('click', dropBall);
